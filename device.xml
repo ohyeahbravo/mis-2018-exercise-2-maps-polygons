@@ -1,0 +1,107 @@
+DROID INFO REPORT
+
+
+DEVICE
+Model: GT-I9195 (serranoltexx)
+Manufacturer: samsung
+Baseband Version: I9195XXSCQA6
+RIL Version: Samsung RIL v3.0
+Build Number: KOT49H.I9195XXSCQA6
+Build Fingerprint: samsung/serranoltexx/serranolte:4.4.2/KOT49H/I9195XXSCQA6:user/release-keys
+Bootloader: I9195XXSCQA6
+Java VM: Dalvik 1.6.0
+OS Version: Kitkat (4.4.2)
+SDK: 19
+
+DISPLAY
+Resolution: qHD, 540x960 pixels
+Software Density: 240 dpi (hdpi)
+Refresh Rate: 60 Hz
+
+PROCESSOR
+CPU Architecture: ARMv7 Processor rev 0 (v7l)
+Board: MSM8960
+Chipset: SAMSUNG SERRANO
+Cores: 2
+Clock Speed: 384 MHz - 1728 MHz
+Instruction Sets: armeabi-v7a, armeabi
+CPU Features: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4
+CPU Governor: ondemand
+Kernel Version: 3.4.0-8894902
+Kernel Architecture: armv7l
+
+GRAPHICS
+Renderer: Adreno (TM) 305
+Vendor: Qualcomm
+OpenGL Version: OpenGL ES 3.0
+
+RAM
+Total: 1331 MB
+Java Heap: 96 MB
+
+STORAGE
+Internal: 5.2 GB
+EXTERNAL: Not Detected
+
+PRIMARY CAMERA
+Resolution: 8 MP
+Flash: Yes
+Video Resolution: Full HD, 1920x1080
+Supported Resolutions: 
+    Image:
+    3264x2448
+    3264x1836
+    2048x1536
+    2048x1152
+    1280x720
+    640x480
+
+    Video:
+    1920x1080 (Full HD)
+    1280x720 (HD)
+    720x480
+    640x480 (VGA)
+    320x240
+    176x144
+
+SECONDARY CAMERA
+Resolution: 2.1 MP
+Video Resolution: HD, 1280x720
+Supported Resolutions: 
+    Image:
+    1920x1080
+    1392x1392
+    1280x720
+    960x720
+
+    Video:
+    1280x720 (HD)
+    720x480
+    640x480 (VGA)
+    320x240
+    176x144
+
+FEATURES
+Bluetooth: Yes
+Bluetooth LE: Yes
+GPS: Yes
+NFC: Yes
+USB Accessory: Yes
+WiFi: Yes
+WiFi Direct: Yes
+
+BATTERY
+Technology: Li-ion
+Health: Good
+
+SENSORS
+MPU-6K Accelerometer
+MPU-6K Gyroscope
+YAS532 Magnetic Sensor
+GP2A Light Sensor
+GP2A Proximity Sensor
+Screen Orientation Sensor
+Rotation Vector Sensor
+Gravity Sensor
+Linear Acceleration Sensor
+Orientation Sensor
