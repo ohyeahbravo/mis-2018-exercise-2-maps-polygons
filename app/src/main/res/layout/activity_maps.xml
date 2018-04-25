@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- reference :
-https://stackoverflow.com/questions/32604876/how-to-add-text-field-edit-field-and-button-on-the-top-of-map -->
+<!-- reference1 :
+https://stackoverflow.com/questions/32604876/how-to-add-text-field-edit-field-and-button-on-the-top-of-map
+reference2 :
+https://stackoverflow.com/questions/4841228/after-type-in-edittext-how-to-make-keyboard-disappear?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+-->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -34,7 +37,9 @@ https://stackoverflow.com/questions/32604876/how-to-add-text-field-edit-field-an
             android:textColorHint="#808080"
             android:layout_marginLeft = "7dp"
             android:layout_marginRight = "10dp"
-            android:layout_marginBottom = "3dp"/>
+            android:layout_marginBottom = "3dp"
+            android:imeOptions="actionDone"
+            android:singleLine = "true"/>
     </RelativeLayout>
 
 </RelativeLayout>

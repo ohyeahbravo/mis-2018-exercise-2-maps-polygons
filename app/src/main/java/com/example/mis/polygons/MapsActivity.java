@@ -7,12 +7,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,11 +24,12 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
 
     private GoogleMap mMap;
     private boolean locationPermissioned;
     private static final int LOCATION_REQUEST_ACCESS = 1;
+    EditText info;
 
     // Default Location is Sydney, in case of null location
     LatLng finalLatLng = new LatLng(-34, 151);
@@ -64,6 +67,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST_ACCESS);
         }
+    }
+
+    /**
+     *
+     * reference: https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap.OnMapLongClickListener
+     * Creates a marker when clicked long.
+     * Text Input Above will be saved as a custom message.
+     * Tapping the marker will show the message.
+     */
+    @Override
+    public void onMapLongClick(LatLng point) {
+        info = findViewById(R.id.text);
+        String infostr = info.getText().toString();
+
+        mMap.addMarker(new MarkerOptions().position(point).title(infostr));
     }
 
     /**
@@ -106,14 +124,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(finalLatLng, 18));
                     }
                 });
+                mMap.setOnMapLongClickListener(this);
             }
         } catch (SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
-
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }
