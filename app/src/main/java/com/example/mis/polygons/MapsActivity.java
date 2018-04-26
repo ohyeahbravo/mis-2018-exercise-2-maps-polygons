@@ -3,6 +3,7 @@ package com.example.mis.polygons;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -26,11 +27,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+
+import static java.lang.Double.parseDouble;
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
 
@@ -39,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     private static final int LOCATION_REQUEST_ACCESS = 1;
     EditText info;
     Button button;
+    int marker_count = 0;
 
     // Default Location is Sydney, in case of null location
     LatLng finalLatLng = new LatLng(-34, 151);
@@ -60,7 +69,78 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         final Button button = findViewById(R.id.polybutton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                SharedPreferences prefs = getSharedPreferences("prefs", 0);
+                Map<String, ?> prefsMap = prefs.getAll();
+
+                double latitude = 0.0;
+                double longitude = 0.0;
+                ArrayList<LatLng> latlngs = new ArrayList<>();
+
+                for(int i = 0; i < marker_count; i++) {
+
+                    Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i+1), null);
+                    Iterator<String> it = values.iterator();
+                    String value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    latlngs.add(new LatLng(latitude, longitude));
+
+                }
+
+                /*
+                for(Map.Entry<String, ?> entry: prefsMap.entrySet()) {
+                    Set<String> values = (Set<String>) entry.getValue();
+                    Iterator<String> it = values.iterator();
+                    String value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    value = it.next();
+                    if(value.startsWith("lat"))
+                        latitude = parseDouble(value.substring(3));
+                    else if(value.startsWith("lng"))
+                        longitude = parseDouble(value.substring(3));
+
+                    latlngs.add(new LatLng(latitude, longitude));
+                }
+                */
+
+                PolygonOptions polygonOptions = new PolygonOptions();
+                polygonOptions.addAll(latlngs);
+                polygonOptions.strokeColor(Color.RED);
+                polygonOptions.fillColor(Color.parseColor("#66000000"));
+
+                Polygon polygon = mMap.addPolygon(polygonOptions);
+
+                System.out.println(latlngs);
+
                 button.setText("End Polygon");
+
+                prefs.edit().clear().apply();
             }
         });
     }
@@ -103,11 +183,13 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         // reference1: https://developer.android.com/training/data-storage/shared-preferences
         // reference2: https://androidforums.com/threads/help-with-putstringset-and-getstringset-method.616410/
         Set<String> values = new HashSet<String>();
-        values.add(String.valueOf(point.latitude));
-        values.add(String.valueOf(point.longitude));
+        values.add("lat" + String.valueOf(point.latitude));
+        values.add("lng" + String.valueOf(point.longitude));
+        values.add("info" + infostr);
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet(infostr, values);
+        marker_count += 1;
+        editor.putStringSet(String.valueOf(marker_count), values);
         Toast.makeText(getApplicationContext(), point.toString(), Toast.LENGTH_LONG).show();
         editor.commit();
     }
