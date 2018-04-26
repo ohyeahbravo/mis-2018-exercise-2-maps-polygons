@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     private boolean locationPermissioned;
     private static final int LOCATION_REQUEST_ACCESS = 1;
     EditText info;
+    Button button;
 
     // Default Location is Sydney, in case of null location
     LatLng finalLatLng = new LatLng(-34, 151);
@@ -52,6 +55,14 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // reference: https://developer.android.com/reference/android/widget/Button
+        final Button button = findViewById(R.id.polybutton);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                button.setText("End Polygon");
+            }
+        });
     }
 
     /**

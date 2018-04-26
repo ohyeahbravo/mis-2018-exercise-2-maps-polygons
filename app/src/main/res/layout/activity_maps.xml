@@ -28,18 +28,27 @@ https://stackoverflow.com/questions/4841228/after-type-in-edittext-how-to-make-k
         android:background="#ffffff">
 
         <EditText
-            android:layout_width="match_parent"
+            android:id="@+id/text"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:id="@+id/text"
-            android:hint="type the info of the location"
-            android:textSize="18sp"
-            android:textColorHint="#808080"
-            android:layout_marginLeft = "7dp"
-            android:layout_marginRight = "10dp"
-            android:layout_marginBottom = "3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="10dp"
+            android:hint="type the info"
             android:imeOptions="actionDone"
-            android:singleLine = "true"/>
+            android:singleLine="true"
+            android:textColorHint="#808080"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/polybutton"
+            android:layout_width="187dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="Start Polygon" />
+
     </RelativeLayout>
 
 </RelativeLayout>
