@@ -70,6 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                // ref: https://stackoverflow.com/questions/22089411/how-to-get-all-keys-of-sharedpreferences-programmatically-in-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                 SharedPreferences prefs = getSharedPreferences("prefs", 0);
                 Map<String, ?> prefsMap = prefs.getAll();
 
@@ -79,6 +80,11 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
 
                 for(int i = 0; i < marker_count; i++) {
 
+                    // reference list
+                    // https://developer.android.com/reference/android/content/SharedPreferences
+                    // https://www.javatpoint.com/substring
+                    // https://stackoverflow.com/questions/16311076/how-to-dynamically-add-polylines-from-an-arraylist?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                    // https://stackoverflow.com/questions/7283338/getting-an-element-from-a-set?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                     Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i+1), null);
                     Iterator<String> it = values.iterator();
                     String value = it.next();
@@ -132,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                 PolygonOptions polygonOptions = new PolygonOptions();
                 polygonOptions.addAll(latlngs);
                 polygonOptions.strokeColor(Color.RED);
+                // reference: https://gist.github.com/lopspower/03fb1cc0ac9f32ef38f4
                 polygonOptions.fillColor(Color.parseColor("#66000000"));
 
                 Polygon polygon = mMap.addPolygon(polygonOptions);
@@ -140,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
 
                 button.setText("End Polygon");
 
+                // reference: https://stackoverflow.com/questions/3687315/deleting-shared-preferences
                 prefs.edit().clear().apply();
             }
         });
