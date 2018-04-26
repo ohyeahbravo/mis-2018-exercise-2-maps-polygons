@@ -1,7 +1,10 @@
 package com.example.mis.polygons;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -23,6 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
 
@@ -80,8 +86,19 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     public void onMapLongClick(LatLng point) {
         info = findViewById(R.id.text);
         String infostr = info.getText().toString();
-
         mMap.addMarker(new MarkerOptions().position(point).title(infostr));
+
+        // Message & Location saved as key/value set in shared preferences.
+        // reference1: https://developer.android.com/training/data-storage/shared-preferences
+        // reference2: https://androidforums.com/threads/help-with-putstringset-and-getstringset-method.616410/
+        Set<String> values = new HashSet<String>();
+        values.add(String.valueOf(point.latitude));
+        values.add(String.valueOf(point.longitude));
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet(infostr, values);
+        Toast.makeText(getApplicationContext(), point.toString(), Toast.LENGTH_LONG).show();
+        editor.commit();
     }
 
     /**
