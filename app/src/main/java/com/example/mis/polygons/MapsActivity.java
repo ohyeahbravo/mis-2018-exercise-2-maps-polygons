@@ -36,10 +36,18 @@ import com.google.android.gms.tasks.Task;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Double.parseDouble;
+import static java.lang.Math.PI;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.tan;
+import static java.lang.Math.toRadians;
+import static java.lang.StrictMath.abs;
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
 
@@ -80,32 +88,32 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                 ArrayList<LatLng> latlngs = new ArrayList<>();
 
                 // go over all markers
-                for(int i = 0; i < marker_count; i++) {
+                for (int i = 0; i < marker_count; i++) {
 
                     // reference list
                     // https://developer.android.com/reference/android/content/SharedPreferences
                     // https://www.javatpoint.com/substring
                     // https://stackoverflow.com/questions/16311076/how-to-dynamically-add-polylines-from-an-arraylist?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                     // https://stackoverflow.com/questions/7283338/getting-an-element-from-a-set?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                    Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i+1), null);
+                    Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i + 1), null);
                     Iterator<String> it = values.iterator();
 
                     String value = it.next();
-                    if(value.startsWith("lat"))
+                    if (value.startsWith("lat"))
                         latitude = parseDouble(value.substring(3));
-                    else if(value.startsWith("lng"))
+                    else if (value.startsWith("lng"))
                         longitude = parseDouble(value.substring(3));
 
                     value = it.next();
-                    if(value.startsWith("lat"))
+                    if (value.startsWith("lat"))
                         latitude = parseDouble(value.substring(3));
-                    else if(value.startsWith("lng"))
+                    else if (value.startsWith("lng"))
                         longitude = parseDouble(value.substring(3));
 
                     value = it.next();
-                    if(value.startsWith("lat"))
+                    if (value.startsWith("lat"))
                         latitude = parseDouble(value.substring(3));
-                    else if(value.startsWith("lng"))
+                    else if (value.startsWith("lng"))
                         longitude = parseDouble(value.substring(3));
 
                     latlngs.add(new LatLng(latitude, longitude));
@@ -120,7 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                 polygonOptions.fillColor(Color.parseColor("#66000000"));
                 Polygon polygon = mMap.addPolygon(polygonOptions);
 
-                // compute the area(m^2) and the centroid
+                // compute the area and the centroid
                 double area = getArea(polygon);
                 LatLng centroid = getCentroid(polygon);
 
@@ -141,27 +149,68 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     }
 
     /**
-     * compute the area in m^2 from the polygon's points
-     * reference:
+     * compute the area from the polygon's points
+     * reference: https://en.wikipedia.org/wiki/Polygon
      */
     private double getArea(Polygon polygon) {
 
         double area = 0.0;
 
-        return area;
+        List<LatLng> points = polygon.getPoints();
+        int numPoints = points.size();
+        double temp = 0;
+        int i = 0;
+        int j = 0;
+
+        for (i = 0; i < numPoints; i++) {
+
+            // (xn, yn) = (x0, x0), where n = number of points
+            if (i == numPoints - 1)
+                j = 0;
+            else j = i + 1;
+
+            double lat1 = points.get(i).latitude;
+            double lat2 = points.get(j).latitude;
+            double lng1 = points.get(i).longitude;
+            double lng2 = points.get(j).longitude;
+            temp = lat1 * lng2 - lat2 * lng1;
+            area += temp;
+        }
+
+        area = area * 0.5;
+
+        return Math.abs(area);
     }
 
     /**
      * compute the centroid from the polygon's points
-     * reference:
+     * reference: https://en.wikipedia.org/wiki/Centroid
      */
     private LatLng getCentroid(Polygon polygon) {
-
         double lat = 0.0;
         double lng = 0.0;
+
+        int i = 0;
+        int j = 0;
+
+        for (i = 0; i < polygon.getPoints().size(); i++) {
+
+            if (i == polygon.getPoints().size() - 1)
+                j = 0;
+            else j = i + 1;
+            double xi = polygon.getPoints().get(i).latitude;
+            double yi1 = polygon.getPoints().get(j).longitude;
+            double xi1 = polygon.getPoints().get(j).longitude;
+            double yi = polygon.getPoints().get(i).latitude;
+
+            lat = lat + ((xi + xi1) * (xi * yi1 - xi1 * yi));
+            lng = lng + ((yi + yi1) * (xi * yi1 - xi1 * yi));
+        }
+
+        lat /= (6 * getArea(polygon));
+        lng /= (6 * getArea(polygon));
+
         LatLng latlng = new LatLng(lat, lng);
-
-
 
         return latlng;
     }
@@ -188,7 +237,6 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     }
 
     /**
-     *
      * reference: https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap.OnMapLongClickListener
      * Creates a marker when clicked long.
      * Text Input Above will be saved as a custom message.
@@ -218,12 +266,11 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     *
+     * <p>
      * The map initially shows the current location of the device.
      * If the location is not available, it shows the default location, which is Sydney, Austrailia.
      * We referenced the following git page from google:
      * https://github.com/googlemaps/android-samples/tree/master/tutorials/CurrentPlaceDetailsOnMap
-     *
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -234,8 +281,8 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         // Add a marker at current location and move the camera
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        try{
-            if(locationPermissioned) {
+        try {
+            if (locationPermissioned) {
 
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -245,7 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         // Set the map's camera position to the current location of the device.
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Location current = task.getResult();
                             finalLatLng = new LatLng(current.getLatitude(), current.getLongitude());
                         } else {
