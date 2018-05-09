@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -130,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
 
                 // compute the area and the centroid
                 double area = getArea(polygon);
-                LatLng centroid = getCentroid(polygon);
+                LatLng centroid = getCentroid(latlngs);
 
                 // move focus to centroid as a marker with computed area
                 Marker marker = mMap.addMarker(new MarkerOptions().position(centroid).title(String.valueOf(area)));
@@ -180,20 +181,35 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         area = area * 0.5;
 
         return Math.abs(area);
+
+        //reference: https://developers.google.com/maps/documentation/android-sdk/utility/
+        //double areaM = SphericalUtil.computeArea(points);
+        //convert the unit of the points
+
+
     }
 
     /**
      * compute the centroid from the polygon's points
      * reference: https://en.wikipedia.org/wiki/Centroid
      */
-    private LatLng getCentroid(Polygon polygon) {
+    private LatLng getCentroid(List<LatLng> points) {
         double lat = 0.0;
         double lng = 0.0;
 
-        int i = 0;
+        for(LatLng pol : points) {
+            lat += pol.latitude;
+            lng += pol.longitude;
+        }
+
+        lat /= points.size();
+        lng /= points.size();
+
+
+/*
         int j = 0;
 
-        for (i = 0; i < polygon.getPoints().size(); i++) {
+        for (int i = 0; i < polygon.getPoints().size(); i++) {
 
             if (i == polygon.getPoints().size() - 1)
                 j = 0;
@@ -209,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
 
         lat /= (6 * getArea(polygon));
         lng /= (6 * getArea(polygon));
-
+*/
         LatLng latlng = new LatLng(lat, lng);
 
         return latlng;

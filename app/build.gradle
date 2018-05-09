@@ -19,7 +19,9 @@ android {
 }
 
 dependencies {
+    implementation'com.google.maps.android:android-maps-utils:0.5+'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
     // reference: https://stackoverflow.com/questions/44651889/cannot-resolve-symbol-fusedlocationproviderclient-google-play-services-version?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
