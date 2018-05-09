@@ -50,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     private static final int LOCATION_REQUEST_ACCESS = 1;
     EditText info;
     int marker_count = 0;
+    private boolean polygon_done;
 
     // Default Location is Sydney, in case of null location
     LatLng finalLatLng = new LatLng(-34, 151);
@@ -69,74 +70,88 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
 
         // reference: https://developer.android.com/reference/android/widget/Button
         final Button button = findViewById(R.id.polybutton);
+        polygon_done = false;
+
+
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                // Get the shared preference object of the given name and get all pairs
-                // ref: https://stackoverflow.com/questions/22089411/how-to-get-all-keys-of-sharedpreferences-programmatically-in-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                SharedPreferences prefs = getSharedPreferences("prefs", 0);
-                Map<String, ?> prefsMap = prefs.getAll();
+                if(!polygon_done){
+                    // Get the shared preference object of the given name and get all pairs
+                    // ref: https://stackoverflow.com/questions/22089411/how-to-get-all-keys-of-sharedpreferences-programmatically-in-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                    SharedPreferences prefs = getSharedPreferences("prefs", 0);
+                    Map<String, ?> prefsMap = prefs.getAll();
 
-                double latitude = 0.0;
-                double longitude = 0.0;
-                ArrayList<LatLng> latlngs = new ArrayList<>();
+                    double latitude = 0.0;
+                    double longitude = 0.0;
+                    ArrayList<LatLng> latlngs = new ArrayList<>();
 
-                // go over all markers
-                for (int i = 0; i < marker_count; i++) {
+                    // go over all markers
+                    for (int i = 0; i < marker_count; i++) {
 
-                    // reference list
-                    // https://developer.android.com/reference/android/content/SharedPreferences
-                    // https://www.javatpoint.com/substring
-                    // https://stackoverflow.com/questions/16311076/how-to-dynamically-add-polylines-from-an-arraylist?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                    // https://stackoverflow.com/questions/7283338/getting-an-element-from-a-set?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                    Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i + 1), null);
-                    Iterator<String> it = values.iterator();
+                        // reference list
+                        // https://developer.android.com/reference/android/content/SharedPreferences
+                        // https://www.javatpoint.com/substring
+                        // https://stackoverflow.com/questions/16311076/how-to-dynamically-add-polylines-from-an-arraylist?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                        // https://stackoverflow.com/questions/7283338/getting-an-element-from-a-set?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                        Set<String> values = (Set<String>) prefs.getStringSet(String.valueOf(i + 1), null);
+                        Iterator<String> it = values.iterator();
 
-                    String value = it.next();
-                    if (value.startsWith("lat"))
-                        latitude = parseDouble(value.substring(3));
-                    else if (value.startsWith("lng"))
-                        longitude = parseDouble(value.substring(3));
+                        String value = it.next();
+                        if (value.startsWith("lat"))
+                            latitude = parseDouble(value.substring(3));
+                        else if (value.startsWith("lng"))
+                            longitude = parseDouble(value.substring(3));
 
-                    value = it.next();
-                    if (value.startsWith("lat"))
-                        latitude = parseDouble(value.substring(3));
-                    else if (value.startsWith("lng"))
-                        longitude = parseDouble(value.substring(3));
+                        value = it.next();
+                        if (value.startsWith("lat"))
+                            latitude = parseDouble(value.substring(3));
+                        else if (value.startsWith("lng"))
+                            longitude = parseDouble(value.substring(3));
 
-                    value = it.next();
-                    if (value.startsWith("lat"))
-                        latitude = parseDouble(value.substring(3));
-                    else if (value.startsWith("lng"))
-                        longitude = parseDouble(value.substring(3));
+                        value = it.next();
+                        if (value.startsWith("lat"))
+                            latitude = parseDouble(value.substring(3));
+                        else if (value.startsWith("lng"))
+                            longitude = parseDouble(value.substring(3));
 
-                    latlngs.add(new LatLng(latitude, longitude));
+                        latlngs.add(new LatLng(latitude, longitude));
 
+                    }
+
+                    // add points to polygons
+                    PolygonOptions polygonOptions = new PolygonOptions();
+                    polygonOptions.addAll(latlngs);
+                    polygonOptions.strokeColor(Color.RED);
+                    // reference: https://gist.github.com/lopspower/03fb1cc0ac9f32ef38f4
+                    polygonOptions.fillColor(Color.parseColor("#66000000"));
+                    Polygon polygon = mMap.addPolygon(polygonOptions);
+
+                    // compute the area and the centroid
+                    String area = getArea(polygon);
+                    LatLng centroid = getCentroid(latlngs);
+
+                    // move focus to centroid as a marker with computed area
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(centroid).title(area));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centroid, 18));
+                    marker.showInfoWindow();    // show the area
+
+                    // clearing the shared preference for the next use
+                    // reference: https://stackoverflow.com/questions/3687315/deleting-shared-preferences
+                    prefs.edit().clear().apply();
+
+                    // change the button display
+                    button.setText("End Polygon");
+                    polygon_done = true;
+                } else {
+                    mMap.clear();
+                    // change the button display
+                    button.setText("Start Polygon");
+                    polygon_done = false;
                 }
 
-                // add points to polygons
-                PolygonOptions polygonOptions = new PolygonOptions();
-                polygonOptions.addAll(latlngs);
-                polygonOptions.strokeColor(Color.RED);
-                // reference: https://gist.github.com/lopspower/03fb1cc0ac9f32ef38f4
-                polygonOptions.fillColor(Color.parseColor("#66000000"));
-                Polygon polygon = mMap.addPolygon(polygonOptions);
 
-                // compute the area and the centroid
-                String area = getArea(polygon);
-                LatLng centroid = getCentroid(latlngs);
 
-                // move focus to centroid as a marker with computed area
-                Marker marker = mMap.addMarker(new MarkerOptions().position(centroid).title(area));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centroid, 18));
-                marker.showInfoWindow();    // show the area
-
-                // clearing the shared preference for the next use
-                // reference: https://stackoverflow.com/questions/3687315/deleting-shared-preferences
-                prefs.edit().clear().apply();
-
-                // change the button display
-                button.setText("End Polygon");
 
             }
         });
@@ -147,10 +162,12 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
      * reference: https://en.wikipedia.org/wiki/Polygon
      */
     private String getArea(Polygon polygon) {
+
         List<LatLng> points = polygon.getPoints();
 
         //reference: https://developers.google.com/maps/documentation/android-sdk/utility/
         double areaM = SphericalUtil.computeArea(points);
+        areaM = Double.valueOf(new DecimalFormat("#.##").format(areaM));
 
         //convert the unit of the points
         String area_unit;
@@ -160,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
             area_unit = areaM + "m²";
         }
         //rounding the converted area
-        areaM = Double.valueOf(new DecimalFormat("#.##").format(areaM));
+
         return area_unit;
 
     }
