@@ -205,27 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         lat /= points.size();
         lng /= points.size();
 
-
-/*
-        int j = 0;
-
-        for (int i = 0; i < polygon.getPoints().size(); i++) {
-
-            if (i == polygon.getPoints().size() - 1)
-                j = 0;
-            else j = i + 1;
-            double xi = polygon.getPoints().get(i).latitude;
-            double yi1 = polygon.getPoints().get(j).longitude;
-            double xi1 = polygon.getPoints().get(j).longitude;
-            double yi = polygon.getPoints().get(i).latitude;
-
-            lat = lat + ((xi + xi1) * (xi * yi1 - xi1 * yi));
-            lng = lng + ((yi + yi1) * (xi * yi1 - xi1 * yi));
-        }
-
-        lat /= (6 * getArea(polygon));
-        lng /= (6 * getArea(polygon));
-*/
+        
         LatLng latlng = new LatLng(lat, lng);
 
         return latlng;
