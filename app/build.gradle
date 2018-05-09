@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
+    //reference: https://developers.google.com/maps/documentation/android-sdk/utility/setup
     implementation'com.google.maps.android:android-maps-utils:0.5+'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -17,7 +16,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
@@ -34,6 +32,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.SphericalUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,12 +41,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Double.parseDouble;
-import static java.lang.Math.PI;
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.tan;
-import static java.lang.Math.toRadians;
 import static java.lang.StrictMath.abs;
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
@@ -130,11 +123,11 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                 Polygon polygon = mMap.addPolygon(polygonOptions);
 
                 // compute the area and the centroid
-                double area = getArea(polygon);
+                String area = getArea(polygon);
                 LatLng centroid = getCentroid(latlngs);
 
                 // move focus to centroid as a marker with computed area
-                Marker marker = mMap.addMarker(new MarkerOptions().position(centroid).title(String.valueOf(area)));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(centroid).title(area));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centroid, 18));
                 marker.showInfoWindow();    // show the area
 
@@ -153,39 +146,22 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
      * compute the area from the polygon's points
      * reference: https://en.wikipedia.org/wiki/Polygon
      */
-    private double getArea(Polygon polygon) {
-
-        double area = 0.0;
-
+    private String getArea(Polygon polygon) {
         List<LatLng> points = polygon.getPoints();
-        int numPoints = points.size();
-        double temp = 0;
-        int i = 0;
-        int j = 0;
-
-        for (i = 0; i < numPoints; i++) {
-
-            // (xn, yn) = (x0, x0), where n = number of points
-            if (i == numPoints - 1)
-                j = 0;
-            else j = i + 1;
-
-            double lat1 = points.get(i).latitude;
-            double lat2 = points.get(j).latitude;
-            double lng1 = points.get(i).longitude;
-            double lng2 = points.get(j).longitude;
-            temp = lat1 * lng2 - lat2 * lng1;
-            area += temp;
-        }
-
-        area = area * 0.5;
-
-        return Math.abs(area);
 
         //reference: https://developers.google.com/maps/documentation/android-sdk/utility/
-        //double areaM = SphericalUtil.computeArea(points);
-        //convert the unit of the points
+        double areaM = SphericalUtil.computeArea(points);
 
+        //convert the unit of the points
+        String area_unit;
+        if(areaM > 1000000) {
+            area_unit = areaM + "km²";
+        } else {
+            area_unit = areaM + "m²";
+        }
+        //rounding the converted area
+        areaM = Double.valueOf(new DecimalFormat("#.##").format(areaM));
+        return area_unit;
 
     }
 
@@ -205,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         lat /= points.size();
         lng /= points.size();
 
-        
+
         LatLng latlng = new LatLng(lat, lng);
 
         return latlng;
