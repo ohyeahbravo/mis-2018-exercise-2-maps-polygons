@@ -145,6 +145,8 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                     polygon_done = true;
                 } else {
                     mMap.clear();
+                    marker_count = 0;
+
                     // change the button display
                     button.setText("Start Polygon");
                     polygon_done = false;
