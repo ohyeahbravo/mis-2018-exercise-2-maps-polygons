@@ -338,5 +338,12 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMap.clear();
     }
 }
