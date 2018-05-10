@@ -41,6 +41,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Double.parseDouble;
+import static java.lang.Math.PI;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.tan;
+import static java.lang.Math.toRadians;
 import static java.lang.StrictMath.abs;
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
@@ -51,6 +57,9 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     EditText info;
     int marker_count = 0;
     private boolean polygon_done;
+
+    //reference: https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/MathUtil.java
+    static final double EARTH_RADIUS = 6371009;
 
     // Default Location is Sydney, in case of null location
     LatLng finalLatLng = new LatLng(-34, 151);
@@ -128,7 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                     Polygon polygon = mMap.addPolygon(polygonOptions);
 
                     // compute the area and the centroid
-                    String area = getArea(polygon);
+                    String area = getArea(latlngs);
                     LatLng centroid = getCentroid(latlngs);
 
                     // move focus to centroid as a marker with computed area
@@ -147,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
                     mMap.clear();
                     marker_count = 0;
 
-                    // change the button display
+                    // change again the button display to start making polygons
                     button.setText("Start Polygon");
                     polygon_done = false;
                 }
@@ -162,26 +171,55 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
     /**
      * compute the area from the polygon's points
      * reference: https://en.wikipedia.org/wiki/Polygon
+     * based on the code of google for the SphericalUtil
+     * reference: https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/SphericalUtil.java
      */
-    private String getArea(Polygon polygon) {
 
-        List<LatLng> points = polygon.getPoints();
+    static double computePolygonArea(List<LatLng> points, double earth) {
+        int size = points.size();
+        if (size < 3) { return 0; }
+        double total = 0;
+        LatLng prev = points.get(size - 1);
+        double prevTanLat = tan((PI / 2 - toRadians(prev.latitude)) / 2);
+        double prevLng = toRadians(prev.longitude);
+        
+        for (LatLng point : points) {
+            double tanLat = tan((PI / 2 - toRadians(point.latitude)) / 2);
+            double lng = toRadians(point.longitude);
+            total += polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
+            prevTanLat = tanLat;
+            prevLng = lng;
+        }
+        return total * (earth * earth);
+    }
 
-        //reference: https://developers.google.com/maps/documentation/android-sdk/utility/
-        double areaM = SphericalUtil.computeArea(points);
-        areaM = Double.valueOf(new DecimalFormat("#.##").format(areaM));
+    /**
+     * Returns the signed area of a triangle which has North Pole as a vertex.
+     * reference: "Spherical Trigonometry" by Todhunter, page 71, section 103, point 2.
+     * See http://books.google.com/books?id=3uBHAAAAIAAJ&pg=PA71
+     */
+    private static double polarTriangleArea(double tan1, double lng1, double tan2, double lng2) {
+        double deltaLng = lng1 - lng2;
+        double t = tan1 * tan2;
+        return 2 * atan2(t * sin(deltaLng), 1 + t * cos(deltaLng));
+    }
+
+    private String getArea(List<LatLng> points) {
+        double area = Math.abs(computePolygonArea(points,EARTH_RADIUS));
+
+        //rounding the converted area
+        //reference: https://github.com/qupath/qupath/issues/29
+        area = Double.valueOf(new DecimalFormat("#.##").format(area));
 
         //convert the unit of the points
         String area_unit;
-        if(areaM > 1000000) {
-            area_unit = areaM + "km²";
+        if(area > 1000000) {
+            area_unit = area + "km²";
         } else {
-            area_unit = areaM + "m²";
+            area_unit = area + "m²";
         }
-        //rounding the converted area
 
         return area_unit;
-
     }
 
     /**
