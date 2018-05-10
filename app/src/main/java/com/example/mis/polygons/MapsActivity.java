@@ -30,7 +30,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.maps.android.SphericalUtil;
+
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.tan;
 import static java.lang.Math.toRadians;
-import static java.lang.StrictMath.abs;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapLongClickListener, OnMapReadyCallback {
 
@@ -182,7 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         LatLng prev = points.get(size - 1);
         double prevTanLat = tan((PI / 2 - toRadians(prev.latitude)) / 2);
         double prevLng = toRadians(prev.longitude);
-        
+
         for (LatLng point : points) {
             double tanLat = tan((PI / 2 - toRadians(point.latitude)) / 2);
             double lng = toRadians(point.longitude);
@@ -214,6 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapLongClickList
         //convert the unit of the points
         String area_unit;
         if(area > 1000000) {
+            area /= 1000;
             area_unit = area + "km²";
         } else {
             area_unit = area + "m²";
